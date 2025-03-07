@@ -44,7 +44,7 @@ public class KeycloakSecurityExample {
          Waiter.waitFor(() -> {
             int responseCode = 0;
             try {
-               URL url = new URL("http://localhost:8080/realms/artemis-keycloak-demo/.well-known/openid-configuration");
+               URL url = new URL("http://localhost:18080/realms/artemis-keycloak-demo/.well-known/openid-configuration");
                HttpURLConnection con = (HttpURLConnection) url.openConnection();
                responseCode = con.getResponseCode();
                con.disconnect();
@@ -53,6 +53,7 @@ public class KeycloakSecurityExample {
             }
             return responseCode == 200;
          }, TimeUnit.SECONDS, 30, TimeUnit.SECONDS, 5);
+
 
          // Step 1. Create an initial context to perform the JNDI lookup.
          initialContext = new InitialContext();

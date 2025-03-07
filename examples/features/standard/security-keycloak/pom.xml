@@ -24,7 +24,7 @@ under the License.
    <parent>
       <groupId>org.apache.activemq.examples.broker</groupId>
       <artifactId>jms-examples</artifactId>
-      <version>2.39.0</version>
+      <version>2.40.0-SNAPSHOT</version>
    </parent>
 
    <artifactId>security-keycloak</artifactId>
@@ -33,7 +33,7 @@ under the License.
 
    <properties>
       <activemq.basedir>${project.basedir}/../../../..</activemq.basedir>
-      <version.org.keycloak>21.1.2</version.org.keycloak>
+      <version.org.keycloak>24.0.5</version.org.keycloak>
       <version.jboss.logging>3.5.0.Final</version.jboss.logging>
    </properties>
 
@@ -48,26 +48,6 @@ under the License.
    <build>
       <plugins>
          <plugin>
-            <groupId>com.googlecode.maven-download-plugin</groupId>
-            <artifactId>download-maven-plugin</artifactId>
-            <version>1.6.1</version>
-            <executions>
-               <execution>
-                  <id>install-keycloak</id>
-                  <phase>pre-integration-test</phase>
-                  <goals>
-                     <goal>wget</goal>
-                  </goals>
-                  <configuration>
-                     <url>https://github.com/keycloak/keycloak/releases/download/${version.org.keycloak}/keycloak-${version.org.keycloak}.tar.gz</url>
-                     <unpack>true</unpack>
-                     <overwrite>false</overwrite>
-                     <skip>${noServer}</skip>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
             <groupId>org.apache.activemq</groupId>
             <artifactId>artemis-maven-plugin</artifactId>
             <executions>
@@ -80,8 +60,10 @@ under the License.
                   <configuration>
                      <ignore>${noServer}</ignore>
                      <noWeb>false</noWeb>
+                     <user>admin</user>
+                     <role>amq</role>
                      <!-- enable keycloak for hawtio via system property overrides, note use of "console" realm in login.config -->
-                     <javaOptions>-Dhawtio.keycloakEnabled=true -Dhawtio.keycloakClientConfig=${ARTEMIS_INSTANCE_ETC_URI}keycloak-js-client.json -Dhawtio.authenticationEnabled=true -Dhawtio.realm=console</javaOptions>
+                     <javaOptions>-Dhawtio.realm=console</javaOptions>
                      <libListWithDeps>
                         <!-- allow keycloak login module classloading from the artemis lib dir-->
                         <arg>org.keycloak:keycloak-adapter-core:jar:${version.org.keycloak}</arg>
@@ -151,34 +133,6 @@ under the License.
                   <version>${version.jboss.logging}</version>
                </dependency>
             </dependencies>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-               <execution>
-                  <id>run-keycloak</id>
-                  <phase>integration-test</phase>
-                  <goals>
-                     <goal>exec</goal>
-                  </goals>
-                  <configuration>
-                     <skip>${noServer}</skip>
-                     <async>true</async>
-                     <executable>./target/keycloak-${version.org.keycloak}/bin/kc.sh</executable>
-                     <arguments>
-                        <argument>start-dev</argument>
-                        <argument>-Dkeycloak.migration.action=import</argument>
-                        <argument>-Dkeycloak.migration.provider=singleFile</argument>
-                        <argument>-Dkeycloak.migration.file=./src/main/resources/artemis-keycloak-demo-realm.json</argument>
-                     </arguments>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-clean-plugin</artifactId>
          </plugin>
       </plugins>
    </build>
